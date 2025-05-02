@@ -34,8 +34,34 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+  flutter_native_splash: ^2.4.6
+  flutter_launcher_icons: ^0.14.3
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/logo/easy_touch_logo.jpg"
+  min_sdk_android: 21 # android min sdk min:16, default 21
+  web:
+    generate: true
+    image_path: "assets/logo/easy_touch_logo.jpg"
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
+
+flutter_native_splash:
+  color: "#FFFFFF"               # Background color (TVs often use dark themes)
+  image: assets/logo/easy_touch_logo.jpg   # Your TV splash screen image
+#  branding: assets/logo/easy_touch_logo.jpg       # Optional smaller branding (e.g., app logo)
+  fullscreen: true               # Good for TV apps
+  android: true
+  ios: false                     # Optional: skip iOS if only building for Android TV
+  web: false
 
 dev_dependencies:
+
+
+
   flutter_test:
     sdk: flutter
 
