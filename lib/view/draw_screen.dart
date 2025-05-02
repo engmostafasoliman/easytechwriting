@@ -1,5 +1,7 @@
 // draw_screen.dart
 import 'package:easytech/model/drawing_action.dart';
+import 'package:easytech/view/widgets/draw_widget/custom_colorpick_button.dart';
+import 'package:easytech/view/widgets/draw_widget/custom_floating_action_button.dart';
 import 'package:easytech/view_model/mypainter.dart';
 import 'package:flutter/material.dart';
 
@@ -22,15 +24,15 @@ class _DrawScreenState extends State<DrawScreen> {
     "assets/background_board/note_book.jpg",
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
-
   ];
   int _counter = 0;
 
   Color _selectedColor = Colors.black;
-  double _strokeWidth = 5.0;
+  double _strokeWidth = 4.0;
   List<DrawingAction> _drawingHistory = [];
   List<DrawingAction> _redoStack = [];
-  List<Offset> _currentPoints = <Offset>[]; // Store points for the current action
+  List<Offset> _currentPoints =
+      <Offset>[]; // Store points for the current action
 
   // Add a DrawingAction for current line
   DrawingAction? _currentDrawingAction;
@@ -65,7 +67,10 @@ class _DrawScreenState extends State<DrawScreen> {
       // create and add a new DrawingAction for the current line
       if (_currentDrawingAction == null) {
         _currentDrawingAction = DrawingAction(
-            points: [], color: _selectedColor, strokeWidth: _strokeWidth);
+          points: [],
+          color: _selectedColor,
+          strokeWidth: _strokeWidth,
+        );
         _drawingHistory.add(_currentDrawingAction!);
       }
       _currentDrawingAction!.points.add(point);
@@ -121,10 +126,135 @@ class _DrawScreenState extends State<DrawScreen> {
         return AlertDialog(
           title: const Text('Pick a color!'),
           content: SingleChildScrollView(
-            child: ColorPicker(
-              pickerColor: _selectedColor,
-              onColorChanged: _changeColor,
-              pickerAreaHeightPercent: 0.8,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 10,
+              children: [
+                Text('Thickness:'),
+                Container(
+
+                  width: MediaQuery.of(context).size.width * 0.4,
+                  child: Slider(
+                    value: _strokeWidth,
+                    min: 1.0,
+                    max: 10.0,
+                    // divisions: 5,
+                    label: _strokeWidth.toStringAsFixed(
+                      1
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _strokeWidth = value;
+                      });
+                    },
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.05,
+
+                  child: Row(
+                    spacing: 10,
+                    children: [
+                      customColorPickButton(
+                        color: Colors.white,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.white;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.grey,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.grey;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.black,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.black;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.yellow,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.yellow;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.orange,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.orange;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.green,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.green;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.deepPurple,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.deepPurple;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.purple,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.purple;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.pink,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.pink;
+                          });
+                        },
+                        context: context,
+                      ),
+                      customColorPickButton(
+                        color: Colors.red,
+                        onTap: () {
+                          setState(() {
+                            _selectedColor = Colors.red;
+                          });
+                        },
+                        context: context,
+                      ),
+                    ],
+                  ),
+                ),
+                ColorPicker(
+                  pickerColor: _selectedColor,
+                  onColorChanged: _changeColor,
+                  pickerAreaHeightPercent: 0.5,
+                ),
+              ],
             ),
           ),
           actions: <Widget>[
@@ -175,18 +305,24 @@ class _DrawScreenState extends State<DrawScreen> {
         onTapDown: (details) {
           // Handle tap down to select a shape
           RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+          Offset localPosition = renderBox.globalToLocal(
+            details.globalPosition,
+          );
         },
         onPanStart: (details) {
           // add a point when start touching the screen
           RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+          Offset localPosition = renderBox.globalToLocal(
+            details.globalPosition,
+          );
           _addPoint(localPosition);
         },
         onPanUpdate: (details) {
           // add a point when the user move the finger
           RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(details.globalPosition);
+          Offset localPosition = renderBox.globalToLocal(
+            details.globalPosition,
+          );
           _addPoint(localPosition);
         },
         onPanEnd: (details) {
@@ -206,62 +342,51 @@ class _DrawScreenState extends State<DrawScreen> {
         ),
       ),
       floatingActionButton: Row(
+        spacing: 10,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          FloatingActionButton(
+          //for background
+          customFloatingActionButton(
             onPressed: _incrementCounter,
-            tooltip: 'Change Background',
+            toolTip: 'Change Background',
             child: const Icon(Icons.keyboard_arrow_right),
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+          //for clear all  drawing
+          customFloatingActionButton(
             onPressed: _clearPoints,
-            tooltip: 'Clear',
+            toolTip: 'Clear',
             child: const Icon(Icons.clear),
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+          //undo
+          customFloatingActionButton(
             onPressed: _undo,
-            tooltip: 'Undo',
+            toolTip: 'Undo',
             child: const Icon(Icons.undo),
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+          //redo
+          customFloatingActionButton(
             onPressed: _redo,
-            tooltip: 'Redo',
+            toolTip: 'Redo',
             child: const Icon(Icons.redo),
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+
+          customFloatingActionButton(
             onPressed: _openColorPicker,
-            tooltip: 'Color',
-            backgroundColor: _selectedColor,
-            child: null,
+            selectedColor: _selectedColor,
+            toolTip: 'Color',
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+
+          customFloatingActionButton(
             onPressed: () {
               _changeStrokeWidth(10);
             },
-            tooltip: 'Width',
+            toolTip: 'Width',
             child: Icon(Icons.line_weight),
           ),
-          SizedBox(
-            width: 15,
-          ),
-          FloatingActionButton(
+
+          customFloatingActionButton(
             onPressed: _deleteSelectedDrawingAction,
-            tooltip: 'Delete',
+            toolTip: 'Delete',
             child: const Icon(Icons.delete),
           ),
         ],
