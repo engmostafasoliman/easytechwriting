@@ -1,5 +1,6 @@
 // draw_screen.dart
 import 'package:easytech/model/drawing_action.dart';
+import 'package:easytech/view/widgets/mypainter.dart';
 import 'package:easytech/view_model/mypainter.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ import 'dart:ui';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class DrawScreen extends StatefulWidget {
-  const DrawScreen({Key? key}) : super(key: key);
+  const DrawScreen({super.key});
 
   @override
   State<DrawScreen> createState() => _DrawScreenState();
@@ -15,14 +16,15 @@ class DrawScreen extends StatefulWidget {
 
 class _DrawScreenState extends State<DrawScreen> {
   List<String> imageList = [
+    "assets/background_board/white_board.png",
     "assets/background_board/black_board.png",
     "assets/background_board/blue_cell.jpg",
     "assets/background_board/line_pattern.jpg",
-    // "assets/background_board/lined_paper_4k.png",
+
     "assets/background_board/note_book.jpg",
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
-    "assets/background_board/white_board.png",
+
   ];
   int _counter = 0;
 

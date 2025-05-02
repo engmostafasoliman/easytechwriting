@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class DrawingAction {
-  final List<Offset> points;
-  final Color color;
-  final double strokeWidth;
+  List<Offset> points;
+  Color color;
+  double strokeWidth;
   bool isSelected;
 
   DrawingAction({
