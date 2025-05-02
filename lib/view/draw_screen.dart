@@ -1,6 +1,5 @@
 // draw_screen.dart
 import 'package:easytech/model/drawing_action.dart';
-import 'package:easytech/view/widgets/mypainter.dart';
 import 'package:easytech/view_model/mypainter.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +19,6 @@ class _DrawScreenState extends State<DrawScreen> {
     "assets/background_board/black_board.png",
     "assets/background_board/blue_cell.jpg",
     "assets/background_board/line_pattern.jpg",
-
     "assets/background_board/note_book.jpg",
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
