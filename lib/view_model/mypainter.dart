@@ -22,7 +22,7 @@ class MyPainter extends CustomPainter {
         final selectionPaint = Paint()
           ..color = Colors.blue.withOpacity(0.5)
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0;
+          ..strokeWidth = 1.0;
 
         // Calculate the bounding box of the shape
         if (action.points.isNotEmpty) {
@@ -39,7 +39,7 @@ class MyPainter extends CustomPainter {
           }
 
           canvas.drawRect(
-            Rect.fromLTRB(minX - 5, minY - 5, maxX + 5, maxY + 5),
+            Rect.fromLTRB(minX - 1, minY - 1, maxX + 1, maxY + 1),
             selectionPaint,
           );
         }
@@ -87,7 +87,7 @@ class MyPainter extends CustomPainter {
   bool _isPointOnLine(
       Offset point, Offset lineStart, Offset lineEnd, double strokeWidth) {
     double distance = _calculateDistanceToLine(point, lineStart, lineEnd);
-    return distance <= strokeWidth + 5; // Tolerance for tap detection
+    return distance <= strokeWidth + 1; // Tolerance for tap detection
   }
 
   // Helper method to calculate the distance between a point and a line segment
