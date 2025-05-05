@@ -12,6 +12,7 @@ Widget customColorPickButton({
       height: MediaQuery.of(context).size.height * 0.05,
       width: MediaQuery.of(context).size.height * 0.05,
       decoration: BoxDecoration(
+
         color: color,
         borderRadius: BorderRadius.circular(5),
       ),

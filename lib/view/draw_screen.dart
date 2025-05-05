@@ -1,8 +1,10 @@
 // draw_screen.dart
 import 'package:easytech/model/drawing_action.dart';
+import 'package:easytech/view/widgets/background_widget/select_background.dart';
 import 'package:easytech/view/widgets/draw_widget/custom_colorpick_button.dart';
 import 'package:easytech/view/widgets/draw_widget/custom_floating_action_button.dart';
 import 'package:easytech/view_model/mypainter.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'dart:ui';
@@ -25,7 +27,8 @@ class _DrawScreenState extends State<DrawScreen> {
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
   ];
-  int _counter = 0;
+
+  // int _counter = selectedBackGroundNum;
 
   Color _selectedColor = Colors.black;
   double _strokeWidth = 4.0;
@@ -38,24 +41,9 @@ class _DrawScreenState extends State<DrawScreen> {
   DrawingAction? _currentDrawingAction;
   DrawingAction? _selectedDrawingAction;
 
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-      if (_counter == imageList.length) {
-        _counter = 0;
-      }
-    });
-  }
-
   void _changeColor(Color color) {
     setState(() {
       _selectedColor = color;
-    });
-  }
-
-  void _changeStrokeWidth(double width) {
-    setState(() {
-      _strokeWidth = width;
     });
   }
 
@@ -119,6 +107,7 @@ class _DrawScreenState extends State<DrawScreen> {
     });
   }
 
+  // color picker method to show color picker dialog
   void _openColorPicker() {
     showDialog(
       context: context,
@@ -133,20 +122,22 @@ class _DrawScreenState extends State<DrawScreen> {
               children: [
                 Text('Thickness:'),
                 Container(
-
                   width: MediaQuery.of(context).size.width * 0.4,
-                  child: Slider(
-                    value: _strokeWidth,
-                    min: 1.0,
-                    max: 10.0,
-                    // divisions: 5,
-                    label: _strokeWidth.toStringAsFixed(
-                      1
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _strokeWidth = value;
-                      });
+
+                  child: StatefulBuilder(
+                    builder: (context, setState) {
+                      return Slider(
+                        value: _strokeWidth,
+                        min: 0,
+                        max: 10,
+
+                        label: _strokeWidth.round().toString(),
+                        onChanged: (value) {
+                          setState(() {
+                            _strokeWidth = value;
+                          });
+                        },
+                      );
                     },
                   ),
                 ),
@@ -249,10 +240,16 @@ class _DrawScreenState extends State<DrawScreen> {
                     ],
                   ),
                 ),
-                ColorPicker(
-                  pickerColor: _selectedColor,
-                  onColorChanged: _changeColor,
-                  pickerAreaHeightPercent: 0.5,
+                Container(
+                  width: 500,
+                  child: ColorPicker(
+                    displayThumbColor: true,
+                    colorPickerWidth: MediaQuery.of(context).size.width * 0.19,
+
+                    pickerColor: _selectedColor,
+                    onColorChanged: _changeColor,
+                    pickerAreaHeightPercent: 0.5,
+                  ),
                 ),
               ],
             ),
@@ -331,7 +328,7 @@ class _DrawScreenState extends State<DrawScreen> {
         child: Container(
           decoration: BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(imageList[_counter]),
+              image: AssetImage(imageList[selectedBackGroundNum]),
               fit: BoxFit.cover,
             ),
           ),
@@ -343,45 +340,42 @@ class _DrawScreenState extends State<DrawScreen> {
       ),
       floatingActionButton: Row(
         spacing: 10,
+        verticalDirection: VerticalDirection.up,
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           //for background
           customFloatingActionButton(
-            onPressed: _incrementCounter,
+            onPressed: () {
+              selectedBackGround(context);
+            },
             toolTip: 'Change Background',
-            child: const Icon(Icons.keyboard_arrow_right),
+            child: const Icon(CupertinoIcons.calendar_badge_minus),
           ),
+
           //for clear all  drawing
           customFloatingActionButton(
             onPressed: _clearPoints,
             toolTip: 'Clear',
-            child: const Icon(Icons.clear),
+            child: const Icon(CupertinoIcons.arrow_2_circlepath),
           ),
           //undo
           customFloatingActionButton(
             onPressed: _undo,
             toolTip: 'Undo',
-            child: const Icon(Icons.undo),
+            child: const Icon(CupertinoIcons.arrowtriangle_left),
           ),
           //redo
           customFloatingActionButton(
             onPressed: _redo,
             toolTip: 'Redo',
-            child: const Icon(Icons.redo),
+            child: Icon(CupertinoIcons.arrowtriangle_right),
           ),
 
           customFloatingActionButton(
             onPressed: _openColorPicker,
-            selectedColor: _selectedColor,
-            toolTip: 'Color',
-          ),
 
-          customFloatingActionButton(
-            onPressed: () {
-              _changeStrokeWidth(10);
-            },
-            toolTip: 'Width',
-            child: Icon(Icons.line_weight),
+            toolTip: 'Color',
+            child: Icon(CupertinoIcons.square_pencil, color: _selectedColor),
           ),
 
           customFloatingActionButton(

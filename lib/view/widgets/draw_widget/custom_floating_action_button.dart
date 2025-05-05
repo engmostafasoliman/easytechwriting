@@ -7,8 +7,11 @@ Widget customFloatingActionButton({
   Widget? child,
 }) {
   return FloatingActionButton(
+
+    materialTapTargetSize:MaterialTapTargetSize.shrinkWrap ,
+    shape: const CircleBorder(),
     onPressed: onPressed,
-    tooltip: 'Color',
+    tooltip: toolTip,
     backgroundColor: selectedColor??Colors.grey,
     child: child,
   );
