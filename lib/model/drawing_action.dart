@@ -12,4 +12,18 @@ class DrawingAction {
     required this.strokeWidth,
     this.isSelected = false,
   });
+  DrawingAction copyWith({
+    List<Offset>? points,
+    Color? color,
+    double? strokeWidth,
+    bool? isSelected,
+  }) {
+    return DrawingAction(
+      points: points ?? this.points,
+      color: color ?? this.color,
+      strokeWidth: strokeWidth ?? this.strokeWidth,
+      isSelected: isSelected ?? this.isSelected,
+    );
+  }
+
 }
