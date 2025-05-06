@@ -1,4 +1,4 @@
-# easytech
+# easyTouch
 
 A new Flutter project.
 
