@@ -2,29 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/drawing_action.dart';
 
+
+
 class DrawingController extends StateNotifier<List<DrawingAction>> {
   DrawingController() : super([]);
 
   final List<DrawingAction> _redoStack = [];
-
   DrawingAction? _currentDrawingAction;
 
-  void addAction(DrawingAction action) {
-    state = [...state, action];
-  }
-
-  void addPoint(Offset point, Color color, double strokeWidth) {
+  void addPoint(Offset point, Color color, double strokeWidth, {bool isErasing = false}) {
     if (_currentDrawingAction == null) {
       _currentDrawingAction = DrawingAction(
         points: [],
         color: color,
-        strokeWidth: strokeWidth,
+        strokeWidth: isErasing ?50:strokeWidth,
+        isErasing: isErasing,
       );
       state = [...state, _currentDrawingAction!];
     }
 
     _currentDrawingAction!.points.add(point);
-    // To trigger repaint while drawing
     state = [...state];
   }
 
@@ -32,8 +29,6 @@ class DrawingController extends StateNotifier<List<DrawingAction>> {
     _currentDrawingAction = null;
     _redoStack.clear();
   }
-
-
 
   void undo() {
     if (state.isNotEmpty) {
@@ -56,16 +51,8 @@ class DrawingController extends StateNotifier<List<DrawingAction>> {
   void deleteSelected() {
     state = state.where((action) => !action.isSelected).toList();
   }
-
-  void selectAction(int index) {
-    state = [
-      for (int i = 0; i < state.length; i++)
-        state[i].copyWith(isSelected: i == index)
-    ];
-  }
 }
 
-final drawingProvider =
-StateNotifierProvider<DrawingController, List<DrawingAction>>((ref) {
+final drawingProvider = StateNotifierProvider<DrawingController, List<DrawingAction>>((ref) {
   return DrawingController();
 });

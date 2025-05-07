@@ -28,8 +28,7 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
   ];
   final selectedColorProvider = StateProvider<Color>((ref) => Colors.black);
   final strokeWidthProvider = StateProvider<double>((ref) => 4.0);
-
-
+  final isErasingProvider = StateProvider<bool>((ref) => false);
 
   void _addPoint(Offset point) {
     ref
@@ -38,9 +37,9 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
           point,
           ref.watch(selectedColorProvider),
           ref.watch(strokeWidthProvider),
+          // ref.watch(isErasingProvider), // <-- new
         );
   }
-
 
   void _openColorPicker() {
     showDialog(
@@ -121,32 +120,36 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
         onPanStart: (details) {
           final localPos = (context.findRenderObject() as RenderBox)
               .globalToLocal(details.globalPosition);
-          _addPoint(localPos); // This starts a new stroke in controller
+          ref
+              .read(drawingProvider.notifier)
+              .addPoint(
+                localPos,
+                ref.read(selectedColorProvider),
+                ref.read(strokeWidthProvider),
+                isErasing: ref.read(isErasingProvider),
+              );
         },
         onPanUpdate: (details) {
           final localPos = (context.findRenderObject() as RenderBox)
               .globalToLocal(details.globalPosition);
-          _addPoint(localPos); // This adds to the stroke
+          ref
+              .read(drawingProvider.notifier)
+              .addPoint(
+                localPos,
+                ref.read(selectedColorProvider),
+                ref.read(strokeWidthProvider),
+                isErasing: ref.read(isErasingProvider),
+              );
         },
         onPanEnd: (_) {
-          ref.read(drawingProvider.notifier).finishDrawing(); // This ends the stroke
+          ref.read(drawingProvider.notifier).finishDrawing();
         },
-        child: Container(
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(
-                imageList[ref.watch(selectedBackgroundIndexProvider)],
-              ),
-              fit: BoxFit.cover,
-            ),
+        child: CustomPaint(
+          painter: MyPainter(
+            drawingHistory: ref.watch(drawingProvider),
+            onSelectDrawingAction: (_) {},
           ),
-          child: CustomPaint(
-            painter: MyPainter(
-              drawingHistory: ref.watch(drawingProvider),
-              onSelectDrawingAction: (action) {},
-            ),
-            size: Size.infinite,
-          ),
+          size: Size.infinite,
         ),
       ),
 
@@ -180,13 +183,21 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
           customFloatingActionButton(
             onPressed: _openColorPicker,
             toolTip: 'Color',
-            child: Icon(CupertinoIcons.square_pencil, color: ref.watch(selectedColorProvider)),
+            child: Icon(
+              CupertinoIcons.square_pencil,
+              color: ref.watch(selectedColorProvider),
+            ),
           ),
+
           customFloatingActionButton(
-            onPressed:
-                () => ref.read(drawingProvider.notifier).deleteSelected(),
-            toolTip: 'Delete',
-            child: const Icon(Icons.delete),
+            onPressed: () {
+              ref.read(isErasingProvider.notifier).state =
+                  !ref.read(isErasingProvider);
+              print(ref.read(isErasingProvider.notifier).state);
+            },
+            toolTip: 'Erase',
+            selectedColor: ref.watch(isErasingProvider)?Colors.blueGrey:null,
+            child: Image.asset("assets/icons/WB_eraser.png",height: 20,width: 20,),
           ),
         ],
       ),
