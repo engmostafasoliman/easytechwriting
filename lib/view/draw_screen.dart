@@ -144,12 +144,23 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
         onPanEnd: (_) {
           ref.read(drawingProvider.notifier).finishDrawing();
         },
-        child: CustomPaint(
-          painter: MyPainter(
-            drawingHistory: ref.watch(drawingProvider),
-            onSelectDrawingAction: (_) {},
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.blue,
+            image: DecorationImage(
+              image: AssetImage(
+                imageList[ref.watch(selectedBackgroundIndexProvider)],
+              ),
+              fit: BoxFit.cover,
+            ),
           ),
-          size: Size.infinite,
+          child: CustomPaint(
+            painter: MyPainter(
+              drawingHistory: ref.watch(drawingProvider),
+              onSelectDrawingAction: (_) {},
+            ),
+            size: Size.infinite,
+          ),
         ),
       ),
 
@@ -196,8 +207,13 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
               print(ref.read(isErasingProvider.notifier).state);
             },
             toolTip: 'Erase',
-            selectedColor: ref.watch(isErasingProvider)?Colors.blueGrey:null,
-            child: Image.asset("assets/icons/WB_eraser.png",height: 20,width: 20,),
+            selectedColor:
+                ref.watch(isErasingProvider) ? Colors.blueGrey : null,
+            child: Image.asset(
+              "assets/icons/WB_eraser.png",
+              height: 20,
+              width: 20,
+            ),
           ),
         ],
       ),
