@@ -18,6 +18,7 @@ class DrawScreen extends ConsumerStatefulWidget {
 
 class _DrawScreenState extends ConsumerState<DrawScreen> {
   List<String> imageList = [
+    "assets/background_board/main_board.png",
     "assets/background_board/white_board.png",
     "assets/background_board/black_board.png",
     "assets/background_board/blue_cell.jpg",
@@ -25,10 +26,9 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
     "assets/background_board/note_book.jpg",
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
+    "assets/background_board/football_background.jpg"
   ];
-  final selectedColorProvider = StateProvider<Color>((ref) => Colors.black);
-  final strokeWidthProvider = StateProvider<double>((ref) => 4.0);
-  final isErasingProvider = StateProvider<bool>((ref) => false);
+
 
   void _addPoint(Offset point) {
     ref
@@ -41,7 +41,34 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
         );
   }
 
-  void _openColorPicker() {
+  deleteAlert() {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            return AlertDialog(
+              title: const Text('Alert!'),
+              content: SingleChildScrollView(
+                child: Text('u will delete all your drawing '),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    ref.read(drawingProvider.notifier).clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _openColorPicker({required double width}) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -54,6 +81,7 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
               title: const Text('Pick a color!'),
               content: SingleChildScrollView(
                 child: Column(
+                  spacing: 5,
                   children: [
                     Text('Thickness:'),
                     Slider(
@@ -65,13 +93,14 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
                         ref.read(strokeWidthProvider.notifier).state = value;
                       },
                     ),
+
                     Wrap(
                       spacing: 5,
                       children: [
                         for (final color in [
-                          Colors.white,
-                          Colors.grey,
                           Colors.black,
+                          Colors.grey,
+                          Colors.white,
                           Colors.yellow,
                           Colors.orange,
                           Colors.green,
@@ -91,6 +120,7 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
                       ],
                     ),
                     ColorPicker(
+                      colorPickerWidth: width,
                       pickerColor: selectedColor,
                       onColorChanged: (color) {
                         ref.read(selectedColorProvider.notifier).state = color;
@@ -115,6 +145,8 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final iconHightSize = MediaQuery.of(context).size.height * 0.04;
+    final iconWidethSize = MediaQuery.of(context).size.width * 0.03;
     return Scaffold(
       body: GestureDetector(
         onPanStart: (details) {
@@ -165,57 +197,101 @@ class _DrawScreenState extends ConsumerState<DrawScreen> {
       ),
 
       ///////////***********    floatingActionButton    ***********///////////
-      floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        spacing: 5,
-        children: [
-          customFloatingActionButton(
-            onPressed: () {
-              selectedBackGround(context, ref);
-            },
-            toolTip: 'Change Background',
-            child: const Icon(CupertinoIcons.calendar_badge_minus),
-          ),
-          customFloatingActionButton(
-            onPressed: () => ref.read(drawingProvider.notifier).clear(),
-            toolTip: 'Clear',
-            child: const Icon(CupertinoIcons.arrow_2_circlepath),
-          ),
-          customFloatingActionButton(
-            onPressed: () => ref.read(drawingProvider.notifier).undo(),
-            toolTip: 'Undo',
-            child: const Icon(CupertinoIcons.arrowtriangle_left),
-          ),
-          customFloatingActionButton(
-            onPressed: () => ref.read(drawingProvider.notifier).redo(),
-            toolTip: 'Redo',
-            child: const Icon(CupertinoIcons.arrowtriangle_right),
-          ),
-          customFloatingActionButton(
-            onPressed: _openColorPicker,
-            toolTip: 'Color',
-            child: Icon(
-              CupertinoIcons.square_pencil,
-              color: ref.watch(selectedColorProvider),
-            ),
-          ),
+      floatingActionButton: Container(
+        width: MediaQuery.of(context).size.width * 0.28,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.blueGrey,
+        ),
 
-          customFloatingActionButton(
-            onPressed: () {
-              ref.read(isErasingProvider.notifier).state =
-                  !ref.read(isErasingProvider);
-              print(ref.read(isErasingProvider.notifier).state);
-            },
-            toolTip: 'Erase',
-            selectedColor:
-                ref.watch(isErasingProvider) ? Colors.blueGrey : null,
-            child: Image.asset(
-              "assets/icons/WB_eraser.png",
-              height: 20,
-              width: 20,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 5,
+          children: [
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed:
+                  () => _openColorPicker(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                  ),
+              toolTip: 'ColorPicker',
+              child: Image.asset(
+                "assets/icons/pen_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
             ),
-          ),
-        ],
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                selectedBackGround(context, ref);
+              },
+              toolTip: 'Change Background',
+              child: Image.asset(
+                "assets/icons/bg_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                deleteAlert();
+              },
+              toolTip: 'Clear',
+              child: Image.asset(
+                "assets/icons/clear_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () => ref.read(drawingProvider.notifier).undo(),
+              toolTip: 'Undo',
+              child: Image.asset(
+                "assets/icons/undo_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () => ref.read(drawingProvider.notifier).redo(),
+              toolTip: 'Redo',
+              child: Image.asset(
+                "assets/icons/redo_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                ref.read(isErasingProvider.notifier).state =
+                    !ref.read(isErasingProvider);
+                print(ref.read(isErasingProvider.notifier).state);
+              },
+              toolTip: 'Erase',
+              selectedColor:
+                  ref.watch(isErasingProvider)
+                      ? Colors.blueGrey.shade400
+                      : null,
+              child: Image.asset(
+                "assets/icons/WB_eraser.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

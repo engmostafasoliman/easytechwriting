@@ -53,13 +53,12 @@ flutter_launcher_icons:
     theme_color: "#FFFFFF"
 
 flutter_native_splash:
-  color: "#FFFFFF"               # Background color (TVs often use dark themes)
-  image: assets/logo/easy_touch_logo.jpg   # Your TV splash screen image
+
+  background_image: "assets/logo/splash.png"
 #  branding: assets/logo/easy_touch_logo.jpg       # Optional smaller branding (e.g., app logo)
   fullscreen: true               # Good for TV apps
   android: true
-  ios: false                     # Optional: skip iOS if only building for Android TV
-  web: false
+
 
 dev_dependencies:
 

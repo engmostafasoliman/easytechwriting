@@ -2,20 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/drawing_action.dart';
 
-
-
 class DrawingController extends StateNotifier<List<DrawingAction>> {
   DrawingController() : super([]);
 
   final List<DrawingAction> _redoStack = [];
   DrawingAction? _currentDrawingAction;
+  final eraserPositionProvider = StateProvider<Offset?>((ref) => null);
 
-  void addPoint(Offset point, Color color, double strokeWidth, {bool isErasing = false}) {
+  void addPoint(
+    Offset point,
+    Color color,
+    double strokeWidth, {
+    bool isErasing = false,
+  }) {
     if (_currentDrawingAction == null) {
       _currentDrawingAction = DrawingAction(
         points: [],
         color: color,
-        strokeWidth: isErasing ?50:strokeWidth,
+        strokeWidth: isErasing ? 50 : strokeWidth,
         isErasing: isErasing,
       );
       state = [...state, _currentDrawingAction!];
@@ -53,6 +57,10 @@ class DrawingController extends StateNotifier<List<DrawingAction>> {
   }
 }
 
-final drawingProvider = StateNotifierProvider<DrawingController, List<DrawingAction>>((ref) {
-  return DrawingController();
-});
+final drawingProvider =
+    StateNotifierProvider<DrawingController, List<DrawingAction>>((ref) {
+      return DrawingController();
+    });
+final selectedColorProvider = StateProvider<Color>((ref) => Colors.black);
+final strokeWidthProvider = StateProvider<double>((ref) => 2.0);
+final isErasingProvider = StateProvider<bool>((ref) => false);
