@@ -4,15 +4,22 @@ Widget customFloatingActionButton({
   required void Function()? onPressed,
    Color? selectedColor,
   required String toolTip,
+  required double width,
+  required double height,
   Widget? child,
 }) {
-  return FloatingActionButton(
+  return SizedBox(
+    height: height*1.9,
+    width: width*1.35,
+    child: FloatingActionButton(
+      elevation: 0,
 
-    materialTapTargetSize:MaterialTapTargetSize.shrinkWrap ,
-    shape: const CircleBorder(),
-    onPressed: onPressed,
-    tooltip: toolTip,
-    backgroundColor: selectedColor??Colors.grey,
-    child: child,
+      materialTapTargetSize:MaterialTapTargetSize.shrinkWrap ,
+
+      onPressed: onPressed,
+      tooltip: toolTip,
+      backgroundColor: selectedColor??Colors.blueGrey,
+      child: child,
+    ),
   );
 }

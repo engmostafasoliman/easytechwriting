@@ -1,24 +1,24 @@
-// draw_screen.dart
 import 'package:easytech/model/drawing_action.dart';
+import 'package:easytech/providers/drawing_provider.dart';
 import 'package:easytech/view/widgets/background_widget/select_background.dart';
 import 'package:easytech/view/widgets/draw_widget/custom_colorpick_button.dart';
 import 'package:easytech/view/widgets/draw_widget/custom_floating_action_button.dart';
 import 'package:easytech/view_model/mypainter.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'dart:ui';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DrawScreen extends StatefulWidget {
+class DrawScreen extends ConsumerStatefulWidget {
   const DrawScreen({super.key});
 
   @override
-  State<DrawScreen> createState() => _DrawScreenState();
+  ConsumerState<DrawScreen> createState() => _DrawScreenState();
 }
 
-class _DrawScreenState extends State<DrawScreen> {
+class _DrawScreenState extends ConsumerState<DrawScreen> {
   List<String> imageList = [
+    "assets/background_board/main_board.png",
     "assets/background_board/white_board.png",
     "assets/background_board/black_board.png",
     "assets/background_board/blue_cell.jpg",
@@ -26,364 +26,272 @@ class _DrawScreenState extends State<DrawScreen> {
     "assets/background_board/note_book.jpg",
     "assets/background_board/small_cell.png",
     "assets/background_board/striped_paper.jpg",
+    "assets/background_board/football_background.jpg"
   ];
 
-  // int _counter = selectedBackGroundNum;
 
-  Color _selectedColor = Colors.black;
-  double _strokeWidth = 4.0;
-  List<DrawingAction> _drawingHistory = [];
-  List<DrawingAction> _redoStack = [];
-  List<Offset> _currentPoints =
-      <Offset>[]; // Store points for the current action
-
-  // Add a DrawingAction for current line
-  DrawingAction? _currentDrawingAction;
-  DrawingAction? _selectedDrawingAction;
-
-  void _changeColor(Color color) {
-    setState(() {
-      _selectedColor = color;
-    });
-  }
-
-  // _addPoint to _currentPoints
   void _addPoint(Offset point) {
-    setState(() {
-      _currentPoints = List.from(_currentPoints)..add(point);
-
-      // create and add a new DrawingAction for the current line
-      if (_currentDrawingAction == null) {
-        _currentDrawingAction = DrawingAction(
-          points: [],
-          color: _selectedColor,
-          strokeWidth: _strokeWidth,
+    ref
+        .read(drawingProvider.notifier)
+        .addPoint(
+          point,
+          ref.watch(selectedColorProvider),
+          ref.watch(strokeWidthProvider),
+          // ref.watch(isErasingProvider), // <-- new
         );
-        _drawingHistory.add(_currentDrawingAction!);
-      }
-      _currentDrawingAction!.points.add(point);
-    });
   }
 
-  // Add the current drawing action to the history
-  void _saveDrawingAction() {
-    if (_currentPoints.isNotEmpty) {
-      setState(() {
-        _currentPoints.clear(); // Clear the points for the next action
-        _redoStack.clear(); // Clear the redo stack on new drawing
-        _currentDrawingAction = null; //clear the current DrawingAction
-      });
-    }
-  }
-
-  //Undo
-  void _undo() {
-    if (_drawingHistory.isNotEmpty) {
-      setState(() {
-        _redoStack.add(_drawingHistory.removeLast());
-        _currentDrawingAction = null;
-      });
-    }
-  }
-
-  //Redo
-  void _redo() {
-    if (_redoStack.isNotEmpty) {
-      setState(() {
-        _drawingHistory.add(_redoStack.removeLast());
-        _currentDrawingAction = null;
-      });
-    }
-  }
-
-  // Clear all the screen
-  void _clearPoints() {
-    setState(() {
-      _drawingHistory.clear();
-      _redoStack.clear();
-      _currentPoints.clear();
-      _currentDrawingAction = null;
-      _selectedDrawingAction = null;
-    });
-  }
-
-  // color picker method to show color picker dialog
-  void _openColorPicker() {
-    showDialog(
+  deleteAlert() {
+    return showDialog(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Pick a color!'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
-              children: [
-                Text('Thickness:'),
-                Container(
-                  width: MediaQuery.of(context).size.width * 0.4,
-
-                  child: StatefulBuilder(
-                    builder: (context, setState) {
-                      return Slider(
-                        value: _strokeWidth,
-                        min: 0,
-                        max: 10,
-
-                        label: _strokeWidth.round().toString(),
-                        onChanged: (value) {
-                          setState(() {
-                            _strokeWidth = value;
-                          });
-                        },
-                      );
-                    },
-                  ),
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.05,
-
-                  child: Row(
-                    spacing: 10,
-                    children: [
-                      customColorPickButton(
-                        color: Colors.white,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.white;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.grey,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.grey;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.black,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.black;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.yellow,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.yellow;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.orange,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.orange;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.green,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.green;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.deepPurple,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.deepPurple;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.purple,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.purple;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.pink,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.pink;
-                          });
-                        },
-                        context: context,
-                      ),
-                      customColorPickButton(
-                        color: Colors.red,
-                        onTap: () {
-                          setState(() {
-                            _selectedColor = Colors.red;
-                          });
-                        },
-                        context: context,
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  width: 500,
-                  child: ColorPicker(
-                    displayThumbColor: true,
-                    colorPickerWidth: MediaQuery.of(context).size.width * 0.19,
-
-                    pickerColor: _selectedColor,
-                    onColorChanged: _changeColor,
-                    pickerAreaHeightPercent: 0.5,
-                  ),
+        return Consumer(
+          builder: (context, ref, _) {
+            return AlertDialog(
+              title: const Text('Alert!'),
+              content: SingleChildScrollView(
+                child: Text('u will delete all your drawing '),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    ref.read(drawingProvider.notifier).clear();
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('Done'),
                 ),
               ],
-            ),
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Done'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
+            );
+          },
         );
       },
     );
   }
 
-  // Handle tap on CustomPaint
-  void _onSelectDrawingAction(DrawingAction? action) {
-    setState(() {
-      // Unselect previously selected action
-      if (_selectedDrawingAction != null) {
-        _selectedDrawingAction!.isSelected = false;
-      }
+  void _openColorPicker({required double width}) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Consumer(
+          builder: (context, ref, _) {
+            Color selectedColor = ref.watch(selectedColorProvider);
+            double strokeWidth = ref.watch(strokeWidthProvider);
 
-      // Select the new one
-      _selectedDrawingAction = action;
+            return AlertDialog(
+              title: const Text('Pick a color!'),
+              content: SingleChildScrollView(
+                child: Column(
+                  spacing: 5,
+                  children: [
+                    Text('Thickness:'),
+                    Slider(
+                      value: strokeWidth,
+                      min: 0,
+                      max: 10,
+                      label: strokeWidth.round().toString(),
+                      onChanged: (value) {
+                        ref.read(strokeWidthProvider.notifier).state = value;
+                      },
+                    ),
 
-      if (_selectedDrawingAction != null) {
-        _selectedDrawingAction!.isSelected = true;
-      }
-    });
-  }
-
-  //delete selected DrawingAction
-  void _deleteSelectedDrawingAction() {
-    setState(() {
-      if (_selectedDrawingAction != null) {
-        _drawingHistory.remove(_selectedDrawingAction);
-        _redoStack.clear();
-        _selectedDrawingAction = null;
-      }
-    });
+                    Wrap(
+                      spacing: 5,
+                      children: [
+                        for (final color in [
+                          Colors.black,
+                          Colors.grey,
+                          Colors.white,
+                          Colors.yellow,
+                          Colors.orange,
+                          Colors.green,
+                          Colors.deepPurple,
+                          Colors.purple,
+                          Colors.pink,
+                          Colors.red,
+                        ])
+                          customColorPickButton(
+                            color: color,
+                            onTap: () {
+                              ref.read(selectedColorProvider.notifier).state =
+                                  color;
+                            },
+                            context: context,
+                          ),
+                      ],
+                    ),
+                    ColorPicker(
+                      colorPickerWidth: width,
+                      pickerColor: selectedColor,
+                      onColorChanged: (color) {
+                        ref.read(selectedColorProvider.notifier).state = color;
+                      },
+                      pickerAreaHeightPercent: 0.5,
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Done'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    final iconHightSize = MediaQuery.of(context).size.height * 0.04;
+    final iconWidethSize = MediaQuery.of(context).size.width * 0.03;
     return Scaffold(
       body: GestureDetector(
-        onTapDown: (details) {
-          // Handle tap down to select a shape
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(
-            details.globalPosition,
-          );
-        },
         onPanStart: (details) {
-          // add a point when start touching the screen
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(
-            details.globalPosition,
-          );
-          _addPoint(localPosition);
+          final localPos = (context.findRenderObject() as RenderBox)
+              .globalToLocal(details.globalPosition);
+          ref
+              .read(drawingProvider.notifier)
+              .addPoint(
+                localPos,
+                ref.read(selectedColorProvider),
+                ref.read(strokeWidthProvider),
+                isErasing: ref.read(isErasingProvider),
+              );
         },
         onPanUpdate: (details) {
-          // add a point when the user move the finger
-          RenderBox renderBox = context.findRenderObject() as RenderBox;
-          Offset localPosition = renderBox.globalToLocal(
-            details.globalPosition,
-          );
-          _addPoint(localPosition);
+          final localPos = (context.findRenderObject() as RenderBox)
+              .globalToLocal(details.globalPosition);
+          ref
+              .read(drawingProvider.notifier)
+              .addPoint(
+                localPos,
+                ref.read(selectedColorProvider),
+                ref.read(strokeWidthProvider),
+                isErasing: ref.read(isErasingProvider),
+              );
         },
-        onPanEnd: (details) {
-          _saveDrawingAction(); // Save the action when the user stops drawing
+        onPanEnd: (_) {
+          ref.read(drawingProvider.notifier).finishDrawing();
         },
         child: Container(
           decoration: BoxDecoration(
+            color: Colors.blue,
             image: DecorationImage(
-              image: AssetImage(imageList[selectedBackGroundNum]),
+              image: AssetImage(
+                imageList[ref.watch(selectedBackgroundIndexProvider)],
+              ),
               fit: BoxFit.cover,
             ),
           ),
           child: CustomPaint(
-            painter: MyPainter(_drawingHistory, _onSelectDrawingAction),
+            painter: MyPainter(
+              drawingHistory: ref.watch(drawingProvider),
+              onSelectDrawingAction: (_) {},
+            ),
             size: Size.infinite,
           ),
         ),
       ),
-      floatingActionButton: Row(
-        spacing: 10,
-        verticalDirection: VerticalDirection.up,
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          //for background
-          customFloatingActionButton(
-            onPressed: () {
-              selectedBackGround(context);
-            },
-            toolTip: 'Change Background',
-            child: const Icon(CupertinoIcons.calendar_badge_minus),
-          ),
 
-          //for clear all  drawing
-          customFloatingActionButton(
-            onPressed: _clearPoints,
-            toolTip: 'Clear',
-            child: const Icon(CupertinoIcons.arrow_2_circlepath),
-          ),
-          //undo
-          customFloatingActionButton(
-            onPressed: _undo,
-            toolTip: 'Undo',
-            child: const Icon(CupertinoIcons.arrowtriangle_left),
-          ),
-          //redo
-          customFloatingActionButton(
-            onPressed: _redo,
-            toolTip: 'Redo',
-            child: Icon(CupertinoIcons.arrowtriangle_right),
-          ),
+      ///////////***********    floatingActionButton    ***********///////////
+      floatingActionButton: Container(
+        width: MediaQuery.of(context).size.width * 0.28,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(5),
+          color: Colors.blueGrey,
+        ),
 
-          customFloatingActionButton(
-            onPressed: _openColorPicker,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          spacing: 5,
+          children: [
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed:
+                  () => _openColorPicker(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                  ),
+              toolTip: 'ColorPicker',
+              child: Image.asset(
+                "assets/icons/pen_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                selectedBackGround(context, ref);
+              },
+              toolTip: 'Change Background',
+              child: Image.asset(
+                "assets/icons/bg_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                deleteAlert();
+              },
+              toolTip: 'Clear',
+              child: Image.asset(
+                "assets/icons/clear_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () => ref.read(drawingProvider.notifier).undo(),
+              toolTip: 'Undo',
+              child: Image.asset(
+                "assets/icons/undo_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () => ref.read(drawingProvider.notifier).redo(),
+              toolTip: 'Redo',
+              child: Image.asset(
+                "assets/icons/redo_flat.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
 
-            toolTip: 'Color',
-            child: Icon(CupertinoIcons.square_pencil, color: _selectedColor),
-          ),
-
-          customFloatingActionButton(
-            onPressed: _deleteSelectedDrawingAction,
-            toolTip: 'Delete',
-            child: const Icon(Icons.delete),
-          ),
-        ],
+            customFloatingActionButton(
+              width: iconWidethSize,
+              height: iconHightSize,
+              onPressed: () {
+                ref.read(isErasingProvider.notifier).state =
+                    !ref.read(isErasingProvider);
+                print(ref.read(isErasingProvider.notifier).state);
+              },
+              toolTip: 'Erase',
+              selectedColor:
+                  ref.watch(isErasingProvider)
+                      ? Colors.blueGrey.shade400
+                      : null,
+              child: Image.asset(
+                "assets/icons/WB_eraser.png",
+                width: iconWidethSize,
+                height: iconHightSize,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
